@@ -64,7 +64,6 @@ class Board:
                 for i in range(top, bottom+1):
                     for j in range(left, right+1):
                         self.board[i][j] = 1
-            # print(self.obstacles)
     
     def getHiderPos_list(self):
         pos = []
@@ -80,10 +79,6 @@ class Board:
             for j in range(len(self.board[i])):
                 if self.board[i][j] == 3:
                     return i, j
-
-    def display_board(self):
-        for row in self.board:
-            print(' '.join(map(str, row)))
 
     def copy(self, startX, startY, endX, endY):
         new_board = []

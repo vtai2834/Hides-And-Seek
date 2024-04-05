@@ -120,7 +120,6 @@ def updateHiderFound(list_hider_pos, hider):
 def aStarSearch(seeker, hider, memoryBoard):
     index = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
     seeker_2 = seeker
-    #print("vị trí hider trong vision: ", hider.getPos())
     # Dùng A* để tìm HIDER
     step = 0
     queue = PriorityQueue()
@@ -133,16 +132,13 @@ def aStarSearch(seeker, hider, memoryBoard):
 
     while not queue.empty():
         frontier = queue.get()
-        ##print (str(preX) + " " + str(preY) + " - " + str(frontier.getPos()))
         if (frontier.isCatch(hider) == True):
-            #print("Đã tìm được đường đi từ Frontier -> hider = A*")
             path = []
             current = frontier
             while current.getPos() != seeker_2.getPos():
                 path.append(current)
                 current = parent[current]
             
-            #print("Truy ngược đường đi từ currentPos -> hider = A*")
             return path.pop()
 
             
@@ -199,7 +195,6 @@ def newSolve(seeker, board, level):
             rowDist = frontier.getPos()[0] - hiderExist[1].getPos()[0]
             colDist = frontier.getPos()[1] - hiderExist[1].getPos()[1]
             if abs(rowDist) <= 1 and abs(colDist) <= 1:
-                print("NEXT")
                 nextBestMove = Seeker('Seeker', hiderExist[1].getPos()[0], hiderExist[1].getPos()[1])
             else:
                 nextBestMove = aStarSearch(frontier, hiderExist[1], memoryBoard)
@@ -207,7 +202,7 @@ def newSolve(seeker, board, level):
         else:       
 
             #Announce:
-            if step % 1 == 0 and step != 0:
+            if step % 5 == 0 and step != 0:
                 list_announce = []
                 for hider in list_hider_pos:
                     aX, aY = hider.announce(memoryBoard)
@@ -224,7 +219,6 @@ def newSolve(seeker, board, level):
                     rowDist = frontier.getPos()[0] - announExist[1].getPos()[0]
                     colDist = frontier.getPos()[1] - announExist[1].getPos()[1]
                     if abs(rowDist) <= 1 and abs(colDist) <= 1:
-                        print("2 đứa kề sát nhau rồi")
                         nextBestMove = Seeker("Seeker", announExist[1].getPos()[0], announExist[1].getPos()[1])
                     else:
                         #lấy bước đi đầu tiên trong đường đi từ frontier -> announce
@@ -255,7 +249,6 @@ def newSolve(seeker, board, level):
         for hider in list_hider_pos:
             if (nextBestMove.isCatch(hider)):
                 score += 20
-                print("Caught seeker move")
                 memoryBoard.getMap()[nextBestMove.getPos()[0]][nextBestMove.getPos()[1]] = 4 #cập nhật lại sau khi tìm thấy 1 hider -> cho hider đó bằng ô trống đã đi qua
                 list_hider_pos = updateHiderFound(list_hider_pos, hider)
 
@@ -282,11 +275,9 @@ def newSolve(seeker, board, level):
                 memoryBoard.updatePos((hider_X, hider_Y), list_hider_pos[h], 2)
 
                 if (nextBestMove.isCatch(list_hider_pos[h])):
-                    print("Caught hider move")
                     score += 20
                     memoryBoard.getMap()[nextBestMove.getPos()[0]][frontier.getPos()[1]] = 4 #cập nhật lại sau khi tìm thấy 1 hider -> cho hider đó bằng ô trống đã đi qua
                     list_hider_pos = updateHiderFound(list_hider_pos, list_hider_pos[h])          
-                    #if h >= len(list_hider_pos): break
 
 
             nextBestMove.setVision(memoryBoard)
@@ -328,7 +319,6 @@ if __name__ == "__main__":
             elif event.type == pygame.KEYDOWN:
                 running = False
 
-        #tham số cuối cùng là level : 1, 2, 3
         score, timing = newSolve(seeker, board, choose_level)
         running = False
 

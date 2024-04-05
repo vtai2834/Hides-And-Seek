@@ -63,10 +63,8 @@ class Hider:
         if startY < 0: startY = 0
         if endY >= memoryBoard.getInfo()[0]:endY = memoryBoard.getInfo()[0] -1
 
-        self.vision = memoryBoard.copy(startX, startY, endX, endY)  #Tầm nhìn của hider là một phần của memoryBoard
-                                                                    #Cần tạo hàm copy 1 phần xác định của Board
-        # Chỉnh VISION sao cho các ô che nhau như yêu cầu của thầy:
-        #Các ô bị che đi đều cho giá trị là -1 (vì không nhìn thấy được -> xem nó như tường):
+        self.vision = memoryBoard.copy(startX, startY, endX, endY)
+
         hiderInVisionX = 2
         hiderInVisionY = 2
 

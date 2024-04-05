@@ -86,10 +86,8 @@ class Seeker:
         if startY < 0: startY = 0
         if endY >= memoryBoard.getInfo()[0]:endY = memoryBoard.getInfo()[0] -1
 
-        self.vision = memoryBoard.copy(startX, startY, endX, endY)  #Tầm nhìn của seeker là một phần của memoryBoard
-                                                                    #Cần tạo hàm copy 1 phần xác định của Board
-        # Chỉnh VISION sao cho các ô che nhau như yêu cầu của thầy:
-        #Các ô bị che đi đều cho giá trị là -1 (vì không nhìn thấy được -> xem nó như tường):
+        self.vision = memoryBoard.copy(startX, startY, endX, endY)
+
         seekerInVisionX = 3
         seekerInVisionY = 3
 
@@ -177,12 +175,9 @@ class Seeker:
             
         return False, None
         
-            
-        # return False, pos   
     def getvision(self):
         return self.vision
 
-    # chỉnh hàm để nó update luôn vị trí hiện tại của Seeker
     def updateMemoryBoard(self, memoryBoard):
         startX = self.position.getPosition()[0] - 3
         startY = self.position.getPosition()[1] - 3
@@ -262,8 +257,7 @@ class Seeker:
         xS, yS = self.getPos()
         pygame.draw.rect(memoryBoard.screen, (255, 0, 0), (marginL + (yS + 1) * memoryBoard.tile_size, (xS + 6) * memoryBoard.tile_size - marginT, memoryBoard.tile_size, memoryBoard.tile_size))
     
-
-    # Hàm sẽ xét tất cả các move kế và chỉ trả về một move tốt nhất   
+  
     def getNextBestMove(self, memoryBoard, previousMoves):
         x, y = self.position.getPosition()
         width, length = memoryBoard.getInfo()
@@ -275,19 +269,16 @@ class Seeker:
         for i in neighbors:
             idx, idy = i[0], i[1]
 
-            # Check Out Of Bounds
             if x + idx < 0 or x + idx >= length:
                 continue
             elif y + idy < 0 or y + idy >= width:
                 continue
-            elif memoryBoard.getMap()[x+idx][y+idy] == 1: # Nếu ô đang check là Wall thì skip
+            elif memoryBoard.getMap()[x+idx][y+idy] == 1:
                 continue
 
             newState = Seeker(self.name, self.position.getPosition()[0] + idx, self.position.getPosition()[1] + idy)
             newState.setVision(memoryBoard)
 
-
-            # Hàm newHeuristic() đổi sang tính số lượng ô '0' thấy được
             stateScore = newState.newHeuristic()
             if stateScore > bestScore:
                 nextBestMove = newState
@@ -298,7 +289,7 @@ class Seeker:
         if bestScore == 0:
             backTracked = 1 # đánh dấu có backTrack
             try:
-                nextBestMove = previousMoves.pop() # lấy ô vừa đi ở lượt trước
+                nextBestMove = previousMoves.pop()
             except:
                 nextBestMove = None
         return nextBestMove, backTracked
@@ -320,7 +311,6 @@ def processVision(vision, seekerRow, seekerColumn):
                             i -= 1    
 
                         # Nếu ô ở ngay trên Seeker
-                        # UPDATE 2/4
                         if row > 0  and row == seekerRow - 1 and col == seekerColumn:
                             i = row - 1
                             while i >= 0:
@@ -335,7 +325,6 @@ def processVision(vision, seekerRow, seekerColumn):
                             i += 1
 
                         # Nếu ô ở ngay dưới Seeker
-                        # UPDATE 2/4
                         if row < width - 1 and row == seekerRow + 1 and col == seekerColumn:
                             i = row + 1
                             while i < width:
@@ -353,7 +342,6 @@ def processVision(vision, seekerRow, seekerColumn):
                             j -= 1
 
                         # Nếu ô ngay trái Seeker
-                        # UPDATE 2/4
                         if col > 0 and col == seekerColumn - 1 and row == seekerRow:
                             j = col - 1
                             while j >= 0:
@@ -368,7 +356,6 @@ def processVision(vision, seekerRow, seekerColumn):
                             j += 1
 
                         # Nếu ô ngay phải Seeker
-                        # UPDATE 2/4
                         if col < length - 1 and col == seekerColumn + 1 and row == seekerRow:
                             j = col + 1
                             while j < length:
@@ -428,7 +415,7 @@ def processVision(vision, seekerRow, seekerColumn):
             for col in range(length):
                 if vision[row][col] == 1:
                     if 0 < row < seekerRow: # 2 ô đang xét nằm trên Seeker
-                        if col < seekerColumn and col < length-1:  # 2 ô nằm bên trái so với Seeker UPDATE: 2/4
+                        if col < seekerColumn and col < length-1:  # 2 ô nằm bên trái so với Seeker
                             if vision[row][col+1] == 1: # 2 ô đang xét nằm ngang
                                 vision[row-1][col] = 1
 
@@ -438,7 +425,7 @@ def processVision(vision, seekerRow, seekerColumn):
                             if col > 0 and vision[row+1][col] == 1:
                                 vision[row][col-1] = 1
 
-                        if col > seekerColumn and col < length-1: # 2 ô nằm bên phải Seeker UPDATE: 2/4
+                        if col > seekerColumn and col < length-1: # 2 ô nằm bên phải Seeker
                             if vision[row][col+1] == 1: # 2 ô nằm ngang
                                 vision[row-1][col+1] = 1
 
@@ -450,7 +437,7 @@ def processVision(vision, seekerRow, seekerColumn):
 
 
                     elif row > seekerRow and row < width - 1:   # 2 ô đang xét nằm dưới Seeker, tương tự như trên
-                        if col < seekerColumn and col < length-1: # UPDATE 2/4
+                        if col < seekerColumn and col < length-1:
                             if vision[row][col+1] == 1:
                                 vision[row+1][col] = 1
 
@@ -460,7 +447,7 @@ def processVision(vision, seekerRow, seekerColumn):
                             if col > 0 and vision[row-1][col] == 1:
                                 vision[row][col-1] = 1
 
-                        elif col > seekerColumn and col < length-1: # UPDATE 2/4
+                        elif col > seekerColumn and col < length-1:
                             if vision[row][col+1] == 1:
                                 vision[row+1][col+1] = 1
 
