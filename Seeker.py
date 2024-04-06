@@ -18,8 +18,6 @@ class Seeker:
         self.position = Position(idx_X, idx_Y)
         self.g = 0
         self.h = 0
-        self.score = 0
-        self.time_elapsed = 0
 
     def setPos(self, u, v):
         self.position = Position(u, v)

@@ -115,6 +115,13 @@ def updateHiderFound(list_hider_pos, hider):
     return list_hider_pos
 
 
+def resetBoard(memoryBoard):
+    for i in range(len(memoryBoard.getMap())):
+        for j in range(len(memoryBoard.getMap()[i])):
+            if memoryBoard.getMap()[i][j] == 4:
+                memoryBoard.getMap()[i][j] = 0
+    return memoryBoard
+
 
 
 def aStarSearch(seeker, hider, memoryBoard):
@@ -228,7 +235,9 @@ def newSolve(seeker, board, level):
                     next = frontier.getNextBestMove(memoryBoard, previousMoves)
                     nextBestMove = next[0]
                     if nextBestMove == None: # không còn ô nào có thể đi nữa
-                        return score, timing
+                        memoryBoard = resetBoard(memoryBoard)
+                        nextBestMove = seeker
+                        continue
                 #cập nhật lại các ô = 5 của announce về lại = 0
                 for an in list_announce:
                     if memoryBoard.getMap()[an.getPos()[0]][an.getPos()[1]] == 5:
@@ -238,7 +247,9 @@ def newSolve(seeker, board, level):
                 next = frontier.getNextBestMove(memoryBoard, previousMoves)
                 nextBestMove = next[0]
                 if nextBestMove == None: # không còn ô nào có thể đi nữa
-                    return score, timing
+                    memoryBoard = resetBoard(memoryBoard)
+                    nextBestMove = seeker
+                    continue
         
         
 
@@ -296,45 +307,51 @@ if __name__ == "__main__":
     choose_level = -1
     
     while True:
-        choose_level, choose_map = select_menu()
-        draw_menu()
-        if choose_level != -1 and choose_level != None and choose_map != -1 and choose_map != None:
-            break
-            
-    
-    map_text = "map" + str(choose_map) + ".txt"
-    choose_level += 1
-    board = Board(map_text, LENGTH, WIDTH)
-    board.load_board()
-    board.setScreen()
-    board.screen.fill((255, 253, 218))
-    pygame.display.flip()
-    seeker = Seeker("seeker", board.getSeekerPos()[0], board.getSeekerPos()[1])
-    seeker.setVision(board)
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                running = False
-
-        score, timing = newSolve(seeker, board, choose_level)
-        running = False
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
-                    running = False
-        board.screen.fill((255, 253, 218))  # Màu nền vàng nhạt
-        pygame.draw.rect(board.screen, (130, 161, 222), (400, 200, 600, 200))
-        font = pygame.font.Font(None, 48)
-        score_text = font.render(f"Score: {score}", True, (0, 0, 0))
-        time_text = font.render(f"Time: {timing}", True, (0, 0, 0))
-        board.screen.blit(score_text, (450, 235))
-        board.screen.blit(time_text, (450, 320))
+        while True:
+            choose_level, choose_map = select_menu()
+            draw_menu()
+            if choose_level != -1 and choose_level != None and choose_map != -1 and choose_map != None:
+                break
+                
+        
+        choose_level += 1
+        map_text = "Map/map" + str(choose_map)
+        if choose_level == 1:
+            map_text += "_Lv1.txt"
+        else:
+            map_text += ".txt"
+        
+        board = Board(map_text, LENGTH, WIDTH)
+        board.load_board()
+        board.setScreen()
+        board.screen.fill((255, 253, 218))
         pygame.display.flip()
+        seeker = Seeker("seeker", board.getSeekerPos()[0], board.getSeekerPos()[1])
+        seeker.setVision(board)
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    running = False
+
+            score, timing = newSolve(seeker, board, choose_level)
+            running = False
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                        running = False
+            board.screen.fill((255, 253, 218))  # Màu nền vàng nhạt
+            pygame.draw.rect(board.screen, (130, 161, 222), (400, 200, 600, 200))
+            font = pygame.font.Font(None, 48)
+            score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+            time_text = font.render(f"Time: {timing}", True, (0, 0, 0))
+            board.screen.blit(score_text, (450, 235))
+            board.screen.blit(time_text, (450, 320))
+            pygame.display.flip()
